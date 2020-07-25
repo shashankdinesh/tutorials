@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Megan L. Risdal" />
+
+
+<title>Exploring the Titanic Dataset</title>
+
+<script src="__results___files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="__results___files/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="__results___files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="__results___files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="__results___files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="__results___files/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code > span.dt { color: #204a87; } /* DataType */
+code > span.dv { color: #0000cf; } /* DecVal */
+code > span.bn { color: #0000cf; } /* BaseN */
+code > span.fl { color: #0000cf; } /* Float */
+code > span.ch { color: #4e9a06; } /* Char */
+code > span.st { color: #4e9a06; } /* String */
+code > span.co { color: #8f5902; font-style: italic; } /* Comment */
+code > span.ot { color: #8f5902; } /* Other */
+code > span.al { color: #ef2929; } /* Alert */
+code > span.fu { color: #000000; } /* Function */
+code > span.er { color: #a40000; font-weight: bold; } /* Error */
+code > span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #000000; } /* Constant */
+code > span.sc { color: #000000; } /* SpecialChar */
+code > span.vs { color: #4e9a06; } /* VerbatimString */
+code > span.ss { color: #4e9a06; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #000000; } /* Variable */
+code > span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code > span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code > span.ex { } /* Extension */
+code > span.at { color: #c4a000; } /* Attribute */
+code > span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code > span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+<base target="_blank" /></head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Exploring the Titanic Dataset</h1>
+<h4 class="author"><em>Megan L. Risdal</em></h4>
+<h4 class="date"><em>6 March 2016</em></h4>
+
+</div>
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a><ul>
+<li><a href="#load-and-check-data"><span class="toc-section-number">1.1</span> Load and check data</a></li>
+</ul></li>
+<li><a href="#feature-engineering"><span class="toc-section-number">2</span> Feature Engineering</a><ul>
+<li><a href="#whats-in-a-name"><span class="toc-section-number">2.1</span> What’s in a name?</a></li>
+<li><a href="#do-families-sink-or-swim-together"><span class="toc-section-number">2.2</span> Do families sink or swim together?</a></li>
+<li><a href="#treat-a-few-more-variables"><span class="toc-section-number">2.3</span> Treat a few more variables …</a></li>
+</ul></li>
+<li><a href="#missingness"><span class="toc-section-number">3</span> Missingness</a><ul>
+<li><a href="#sensible-value-imputation"><span class="toc-section-number">3.1</span> Sensible value imputation</a></li>
+<li><a href="#predictive-imputation"><span class="toc-section-number">3.2</span> Predictive imputation</a></li>
+<li><a href="#feature-engineering-round-2"><span class="toc-section-number">3.3</span> Feature Engineering: Round 2</a></li>
+</ul></li>
+<li><a href="#prediction"><span class="toc-section-number">4</span> Prediction</a><ul>
+<li><a href="#split-into-training-test-sets"><span class="toc-section-number">4.1</span> Split into training &amp; test sets</a></li>
+<li><a href="#building-the-model"><span class="toc-section-number">4.2</span> Building the model</a></li>
+<li><a href="#variable-importance"><span class="toc-section-number">4.3</span> Variable importance</a></li>
+<li><a href="#prediction-1"><span class="toc-section-number">4.4</span> Prediction!</a></li>
+</ul></li>
+<li><a href="#conclusion"><span class="toc-section-number">5</span> Conclusion</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>This is my first stab at a Kaggle script. I have chosen to work with the Titanic dataset after spending some time poking around on the site and looking at other scripts made by other Kagglers for inspiration. I will also focus on doing some illustrative data visualizations along the way. I’ll then use <code>randomForest</code> to create a model predicting survival on the Titanic. I am new to machine learning and hoping to learn a lot, so feedback is very welcome!</p>
+<p>There are three parts to my script as follows:</p>
+<ul>
+<li>Feature engineering</li>
+<li>Missing value imputation</li>
+<li>Prediction!</li>
+</ul>
+<div id="load-and-check-data" class="section level2">
+<h2><span class="header-section-number">1.1</span> Load and check data</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Load packages</span>
+<span class="kw">library</span>(<span class="st">&#39;ggplot2&#39;</span>) <span class="co"># visualization</span>
+<span class="kw">library</span>(<span class="st">&#39;ggthemes&#39;</span>) <span class="co"># visualization</span>
+<span class="kw">library</span>(<span class="st">&#39;scales&#39;</span>) <span class="co"># visualization</span>
+<span class="kw">library</span>(<span class="st">&#39;dplyr&#39;</span>) <span class="co"># data manipulation</span>
+<span class="kw">library</span>(<span class="st">&#39;mice&#39;</span>) <span class="co"># imputation</span>
+<span class="kw">library</span>(<span class="st">&#39;randomForest&#39;</span>) <span class="co"># classification algorithm</span></code></pre></div>
+<p>Now that our packages are loaded, let’s read in and take a peek at the data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&#39;../input/train.csv&#39;</span>, <span class="dt">stringsAsFactors =</span> F)
+test  &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&#39;../input/test.csv&#39;</span>, <span class="dt">stringsAsFactors =</span> F)
+
+full  &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(train, test) <span class="co"># bind training &amp; test data</span>
+
+<span class="co"># check data</span>
+<span class="kw">str</span>(full)</code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    1309 obs. of  12 variables:
+##  $ PassengerId: int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ Survived   : int  0 1 1 1 0 0 0 0 1 1 ...
+##  $ Pclass     : int  3 1 3 1 3 3 1 3 3 2 ...
+##  $ Name       : chr  &quot;Braund, Mr. Owen Harris&quot; &quot;Cumings, Mrs. John Bradley (Florence Briggs Thayer)&quot; &quot;Heikkinen, Miss. Laina&quot; &quot;Futrelle, Mrs. Jacques Heath (Lily May Peel)&quot; ...
+##  $ Sex        : chr  &quot;male&quot; &quot;female&quot; &quot;female&quot; &quot;female&quot; ...
+##  $ Age        : num  22 38 26 35 35 NA 54 2 27 14 ...
+##  $ SibSp      : int  1 1 0 1 0 0 0 3 0 1 ...
+##  $ Parch      : int  0 0 0 0 0 0 0 1 2 0 ...
+##  $ Ticket     : chr  &quot;A/5 21171&quot; &quot;PC 17599&quot; &quot;STON/O2. 3101282&quot; &quot;113803&quot; ...
+##  $ Fare       : num  7.25 71.28 7.92 53.1 8.05 ...
+##  $ Cabin      : chr  &quot;&quot; &quot;C85&quot; &quot;&quot; &quot;C123&quot; ...
+##  $ Embarked   : chr  &quot;S&quot; &quot;C&quot; &quot;S&quot; &quot;S&quot; ...</code></pre>
+<p>We’ve got a sense of our variables, their class type, and the first few observations of each. We know we’re working with 1309 observations of 12 variables. To make things a bit more explicit since a couple of the variable names aren’t 100% illuminating, here’s what we’ve got to deal with:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Variable Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Survived</td>
+<td>Survived (1) or died (0)</td>
+</tr>
+<tr class="even">
+<td>Pclass</td>
+<td>Passenger’s class</td>
+</tr>
+<tr class="odd">
+<td>Name</td>
+<td>Passenger’s name</td>
+</tr>
+<tr class="even">
+<td>Sex</td>
+<td>Passenger’s sex</td>
+</tr>
+<tr class="odd">
+<td>Age</td>
+<td>Passenger’s age</td>
+</tr>
+<tr class="even">
+<td>SibSp</td>
+<td>Number of siblings/spouses aboard</td>
+</tr>
+<tr class="odd">
+<td>Parch</td>
+<td>Number of parents/children aboard</td>
+</tr>
+<tr class="even">
+<td>Ticket</td>
+<td>Ticket number</td>
+</tr>
+<tr class="odd">
+<td>Fare</td>
+<td>Fare</td>
+</tr>
+<tr class="even">
+<td>Cabin</td>
+<td>Cabin</td>
+</tr>
+<tr class="odd">
+<td>Embarked</td>
+<td>Port of embarkation</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="feature-engineering" class="section level1">
+<h1><span class="header-section-number">2</span> Feature Engineering</h1>
+<div id="whats-in-a-name" class="section level2">
+<h2><span class="header-section-number">2.1</span> What’s in a name?</h2>
+<p>The first variable which catches my attention is <strong>passenger name</strong> because we can break it down into additional meaningful variables which can feed predictions or be used in the creation of additional new variables. For instance, <strong>passenger title</strong> is contained within the passenger name variable and we can use <strong>surname</strong> to represent families. Let’s do some <strong>feature engineering</strong>!</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Grab title from passenger names</span>
+full<span class="op">$</span>Title &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&#39;(.*, )|(</span><span class="ch">\\</span><span class="st">..*)&#39;</span>, <span class="st">&#39;&#39;</span>, full<span class="op">$</span>Name)
+
+<span class="co"># Show title counts by sex</span>
+<span class="kw">table</span>(full<span class="op">$</span>Sex, full<span class="op">$</span>Title)</code></pre></div>
+<pre><code>##         
+##          Capt Col Don Dona  Dr Jonkheer Lady Major Master Miss Mlle Mme
+##   female    0   0   0    1   1        0    1     0      0  260    2   1
+##   male      1   4   1    0   7        1    0     2     61    0    0   0
+##         
+##           Mr Mrs  Ms Rev Sir the Countess
+##   female   0 197   2   0   0            1
+##   male   757   0   0   8   1            0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Titles with very low cell counts to be combined to &quot;rare&quot; level</span>
+rare_title &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Dona&#39;</span>, <span class="st">&#39;Lady&#39;</span>, <span class="st">&#39;the Countess&#39;</span>,<span class="st">&#39;Capt&#39;</span>, <span class="st">&#39;Col&#39;</span>, <span class="st">&#39;Don&#39;</span>, 
+                <span class="st">&#39;Dr&#39;</span>, <span class="st">&#39;Major&#39;</span>, <span class="st">&#39;Rev&#39;</span>, <span class="st">&#39;Sir&#39;</span>, <span class="st">&#39;Jonkheer&#39;</span>)
+
+<span class="co"># Also reassign mlle, ms, and mme accordingly</span>
+full<span class="op">$</span>Title[full<span class="op">$</span>Title <span class="op">==</span><span class="st"> &#39;Mlle&#39;</span>]        &lt;-<span class="st"> &#39;Miss&#39;</span> 
+full<span class="op">$</span>Title[full<span class="op">$</span>Title <span class="op">==</span><span class="st"> &#39;Ms&#39;</span>]          &lt;-<span class="st"> &#39;Miss&#39;</span>
+full<span class="op">$</span>Title[full<span class="op">$</span>Title <span class="op">==</span><span class="st"> &#39;Mme&#39;</span>]         &lt;-<span class="st"> &#39;Mrs&#39;</span> 
+full<span class="op">$</span>Title[full<span class="op">$</span>Title <span class="op">%in%</span><span class="st"> </span>rare_title]  &lt;-<span class="st"> &#39;Rare Title&#39;</span>
+
+<span class="co"># Show title counts by sex again</span>
+<span class="kw">table</span>(full<span class="op">$</span>Sex, full<span class="op">$</span>Title)</code></pre></div>
+<pre><code>##         
+##          Master Miss  Mr Mrs Rare Title
+##   female      0  264   0 198          4
+##   male       61    0 757   0         25</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Finally, grab surname from passenger name</span>
+full<span class="op">$</span>Surname &lt;-<span class="st"> </span><span class="kw">sapply</span>(full<span class="op">$</span>Name,  
+                      <span class="cf">function</span>(x) <span class="kw">strsplit</span>(x, <span class="dt">split =</span> <span class="st">&#39;[,.]&#39;</span>)[[<span class="dv">1</span>]][<span class="dv">1</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="kw">paste</span>(<span class="st">&#39;We have &lt;b&gt;&#39;</span>, <span class="kw">nlevels</span>(<span class="kw">factor</span>(full<span class="op">$</span>Surname)), <span class="st">&#39;&lt;/b&gt; unique surnames. I would be interested to infer ethnicity based on surname --- another time.&#39;</span>))</code></pre></div>
+<p>We have <b> 875 </b> unique surnames. I would be interested to infer ethnicity based on surname — another time.</p>
+</div>
+<div id="do-families-sink-or-swim-together" class="section level2">
+<h2><span class="header-section-number">2.2</span> Do families sink or swim together?</h2>
+<p>Now that we’ve taken care of splitting passenger name into some new variables, we can take it a step further and make some new family variables. First we’re going to make a <strong>family size</strong> variable based on number of siblings/spouse(s) (maybe someone has more than one spouse?) and number of children/parents.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a family size variable including the passenger themselves</span>
+full<span class="op">$</span>Fsize &lt;-<span class="st"> </span>full<span class="op">$</span>SibSp <span class="op">+</span><span class="st"> </span>full<span class="op">$</span>Parch <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+
+<span class="co"># Create a family variable </span>
+full<span class="op">$</span>Family &lt;-<span class="st"> </span><span class="kw">paste</span>(full<span class="op">$</span>Surname, full<span class="op">$</span>Fsize, <span class="dt">sep=</span><span class="st">&#39;_&#39;</span>)</code></pre></div>
+<p>What does our family size variable look like? To help us understand how it may relate to survival, let’s plot it among the training data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Use ggplot2 to visualize the relationship between family size &amp; survival</span>
+<span class="kw">ggplot</span>(full[<span class="dv">1</span><span class="op">:</span><span class="dv">891</span>,], <span class="kw">aes</span>(<span class="dt">x =</span> Fsize, <span class="dt">fill =</span> <span class="kw">factor</span>(Survived))) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&#39;count&#39;</span>, <span class="dt">position=</span><span class="st">&#39;dodge&#39;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks=</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">11</span>)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&#39;Family Size&#39;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_few</span>()</code></pre></div>
+<p><img src="__results___files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Ah hah. We can see that there’s a survival penalty to singletons and those with family sizes above 4. We can collapse this variable into three levels which will be helpful since there are comparatively fewer large families. Let’s create a <strong>discretized family size</strong> variable.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Discretize family size</span>
+full<span class="op">$</span>FsizeD[full<span class="op">$</span>Fsize <span class="op">==</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> &#39;singleton&#39;</span>
+full<span class="op">$</span>FsizeD[full<span class="op">$</span>Fsize <span class="op">&lt;</span><span class="st"> </span><span class="dv">5</span> <span class="op">&amp;</span><span class="st"> </span>full<span class="op">$</span>Fsize <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> &#39;small&#39;</span>
+full<span class="op">$</span>FsizeD[full<span class="op">$</span>Fsize <span class="op">&gt;</span><span class="st"> </span><span class="dv">4</span>] &lt;-<span class="st"> &#39;large&#39;</span>
+
+<span class="co"># Show family size by survival using a mosaic plot</span>
+<span class="kw">mosaicplot</span>(<span class="kw">table</span>(full<span class="op">$</span>FsizeD, full<span class="op">$</span>Survived), <span class="dt">main=</span><span class="st">&#39;Family Size by Survival&#39;</span>, <span class="dt">shade=</span><span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="__results___files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>The mosaic plot shows that we preserve our rule that there’s a survival penalty among singletons and large families, but a benefit for passengers in small families. I want to do something further with our age variable, but 263 rows have missing age values, so we will have to wait until after we address missingness.</p>
+</div>
+<div id="treat-a-few-more-variables" class="section level2">
+<h2><span class="header-section-number">2.3</span> Treat a few more variables …</h2>
+<p>What’s left? There’s probably some potentially useful information in the <strong>passenger cabin</strong> variable including about their <strong>deck</strong>. Let’s take a look.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This variable appears to have a lot of missing values</span>
+full<span class="op">$</span>Cabin[<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</code></pre></div>
+<pre><code>##  [1] &quot;&quot;            &quot;C85&quot;         &quot;&quot;            &quot;C123&quot;        &quot;&quot;           
+##  [6] &quot;&quot;            &quot;E46&quot;         &quot;&quot;            &quot;&quot;            &quot;&quot;           
+## [11] &quot;G6&quot;          &quot;C103&quot;        &quot;&quot;            &quot;&quot;            &quot;&quot;           
+## [16] &quot;&quot;            &quot;&quot;            &quot;&quot;            &quot;&quot;            &quot;&quot;           
+## [21] &quot;&quot;            &quot;D56&quot;         &quot;&quot;            &quot;A6&quot;          &quot;&quot;           
+## [26] &quot;&quot;            &quot;&quot;            &quot;C23 C25 C27&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The first character is the deck. For example:</span>
+<span class="kw">strsplit</span>(full<span class="op">$</span>Cabin[<span class="dv">2</span>], <span class="ot">NULL</span>)[[<span class="dv">1</span>]]</code></pre></div>
+<pre><code>## [1] &quot;C&quot; &quot;8&quot; &quot;5&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a Deck variable. Get passenger deck A - F:</span>
+full<span class="op">$</span>Deck&lt;-<span class="kw">factor</span>(<span class="kw">sapply</span>(full<span class="op">$</span>Cabin, <span class="cf">function</span>(x) <span class="kw">strsplit</span>(x, <span class="ot">NULL</span>)[[<span class="dv">1</span>]][<span class="dv">1</span>]))</code></pre></div>
+<p>There’s more that likely could be done here including looking into cabins with multiple rooms listed (e.g., row 28: “C23 C25 C27”), but given the sparseness of the column we’ll stop here.</p>
+</div>
+</div>
+<div id="missingness" class="section level1">
+<h1><span class="header-section-number">3</span> Missingness</h1>
+<p>Now we’re ready to start exploring missing data and rectifying it through imputation. There are a number of different ways we could go about doing this. Given the small size of the dataset, we probably should not opt for deleting either entire observations (rows) or variables (columns) containing missing values. We’re left with the option of either replacing missing values with a sensible values given the distribution of the data, e.g., the mean, median or mode. Finally, we could go with prediction. We’ll use both of the two latter methods and I’ll rely on some data visualization to guide our decisions.</p>
+<div id="sensible-value-imputation" class="section level2">
+<h2><span class="header-section-number">3.1</span> Sensible value imputation</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Passengers 62 and 830 are missing Embarkment</span>
+full[<span class="kw">c</span>(<span class="dv">62</span>, <span class="dv">830</span>), <span class="st">&#39;Embarked&#39;</span>]</code></pre></div>
+<pre><code>## [1] &quot;&quot; &quot;&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cat</span>(<span class="kw">paste</span>(<span class="st">&#39;We will infer their values for **embarkment** based on present data that we can imagine may be relevant: **passenger class** and **fare**. We see that they paid&lt;b&gt; $&#39;</span>, full[<span class="kw">c</span>(<span class="dv">62</span>, <span class="dv">830</span>), <span class="st">&#39;Fare&#39;</span>][[<span class="dv">1</span>]][<span class="dv">1</span>], <span class="st">&#39;&lt;/b&gt;and&lt;b&gt; $&#39;</span>, full[<span class="kw">c</span>(<span class="dv">62</span>, <span class="dv">830</span>), <span class="st">&#39;Fare&#39;</span>][[<span class="dv">1</span>]][<span class="dv">2</span>], <span class="st">&#39;&lt;/b&gt;respectively and their classes are&lt;b&gt;&#39;</span>, full[<span class="kw">c</span>(<span class="dv">62</span>, <span class="dv">830</span>), <span class="st">&#39;Pclass&#39;</span>][[<span class="dv">1</span>]][<span class="dv">1</span>], <span class="st">&#39;&lt;/b&gt;and&lt;b&gt;&#39;</span>, full[<span class="kw">c</span>(<span class="dv">62</span>, <span class="dv">830</span>), <span class="st">&#39;Pclass&#39;</span>][[<span class="dv">1</span>]][<span class="dv">2</span>], <span class="st">&#39;&lt;/b&gt;. So from where did they embark?&#39;</span>))</code></pre></div>
+<p>We will infer their values for <strong>embarkment</strong> based on present data that we can imagine may be relevant: <strong>passenger class</strong> and <strong>fare</strong>. We see that they paid<b> $ 80 </b>and<b> $ NA </b>respectively and their classes are<b> 1 </b>and<b> NA </b>. So from where did they embark?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Get rid of our missing passenger IDs</span>
+embark_fare &lt;-<span class="st"> </span>full <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>(PassengerId <span class="op">!=</span><span class="st"> </span><span class="dv">62</span> <span class="op">&amp;</span><span class="st"> </span>PassengerId <span class="op">!=</span><span class="st"> </span><span class="dv">830</span>)
+
+<span class="co"># Use ggplot2 to visualize embarkment, passenger class, &amp; median fare</span>
+<span class="kw">ggplot</span>(embark_fare, <span class="kw">aes</span>(<span class="dt">x =</span> Embarked, <span class="dt">y =</span> Fare, <span class="dt">fill =</span> <span class="kw">factor</span>(Pclass))) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="kw">aes</span>(<span class="dt">yintercept=</span><span class="dv">80</span>), 
+    <span class="dt">colour=</span><span class="st">&#39;red&#39;</span>, <span class="dt">linetype=</span><span class="st">&#39;dashed&#39;</span>, <span class="dt">lwd=</span><span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels=</span><span class="kw">dollar_format</span>()) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_few</span>()</code></pre></div>
+<p><img src="__results___files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Voilà! The median fare for a first class passenger departing from Charbourg (‘C’) coincides nicely with the $80 paid by our embarkment-deficient passengers. I think we can safely replace the NA values with ‘C’.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Since their fare was $80 for 1st class, they most likely embarked from &#39;C&#39;</span>
+full<span class="op">$</span>Embarked[<span class="kw">c</span>(<span class="dv">62</span>, <span class="dv">830</span>)] &lt;-<span class="st"> &#39;C&#39;</span></code></pre></div>
+<p>We’re close to fixing the handful of NA values here and there. Passenger on row 1044 has an NA Fare value.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Show row 1044</span>
+full[<span class="dv">1044</span>, ]</code></pre></div>
+<pre><code>##      PassengerId Survived Pclass               Name  Sex  Age SibSp Parch
+## 1044        1044       NA      3 Storey, Mr. Thomas male 60.5     0     0
+##      Ticket Fare Cabin Embarked Title Surname Fsize   Family    FsizeD
+## 1044   3701   NA              S    Mr  Storey     1 Storey_1 singleton
+##      Deck
+## 1044 &lt;NA&gt;</code></pre>
+<p>This is a third class passenger who departed from Southampton (‘S’). Let’s visualize Fares among all others sharing their class and embarkment (n = 494).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(full[full<span class="op">$</span>Pclass <span class="op">==</span><span class="st"> &#39;3&#39;</span> <span class="op">&amp;</span><span class="st"> </span>full<span class="op">$</span>Embarked <span class="op">==</span><span class="st"> &#39;S&#39;</span>, ], 
+  <span class="kw">aes</span>(<span class="dt">x =</span> Fare)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_density</span>(<span class="dt">fill =</span> <span class="st">&#39;#99d6ff&#39;</span>, <span class="dt">alpha=</span><span class="fl">0.4</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="kw">aes</span>(<span class="dt">xintercept=</span><span class="kw">median</span>(Fare, <span class="dt">na.rm=</span>T)),
+    <span class="dt">colour=</span><span class="st">&#39;red&#39;</span>, <span class="dt">linetype=</span><span class="st">&#39;dashed&#39;</span>, <span class="dt">lwd=</span><span class="dv">1</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">labels=</span><span class="kw">dollar_format</span>()) <span class="op">+</span>
+<span class="st">  </span><span class="kw">theme_few</span>()</code></pre></div>
+<p><img src="__results___files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>From this visualization, it seems quite reasonable to replace the NA Fare value with median for their class and embarkment which is $8.05.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Replace missing fare value with median fare for class/embarkment</span>
+full<span class="op">$</span>Fare[<span class="dv">1044</span>] &lt;-<span class="st"> </span><span class="kw">median</span>(full[full<span class="op">$</span>Pclass <span class="op">==</span><span class="st"> &#39;3&#39;</span> <span class="op">&amp;</span><span class="st"> </span>full<span class="op">$</span>Embarked <span class="op">==</span><span class="st"> &#39;S&#39;</span>, ]<span class="op">$</span>Fare, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+</div>
+<div id="predictive-imputation" class="section level2">
+<h2><span class="header-section-number">3.2</span> Predictive imputation</h2>
+<p>Finally, as we noted earlier, there are quite a few missing <strong>Age</strong> values in our data. We are going to get a bit more fancy in imputing missing age values. Why? Because we can. We will create a model predicting ages based on other variables.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Show number of missing Age values</span>
+<span class="kw">sum</span>(<span class="kw">is.na</span>(full<span class="op">$</span>Age))</code></pre></div>
+<pre><code>## [1] 263</code></pre>
+<p>We could definitely use <code>rpart</code> (recursive partitioning for regression) to predict missing ages, but I’m going to use the <code>mice</code> package for this task just for something different. You can read more about multiple imputation using chained equations in r <a href="http://www.jstatsoft.org/article/view/v045i03/v45i03.pdf">here</a> (PDF). Since we haven’t done it yet, I’ll first factorize the factor variables and then perform mice imputation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Make variables factors into factors</span>
+factor_vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;PassengerId&#39;</span>,<span class="st">&#39;Pclass&#39;</span>,<span class="st">&#39;Sex&#39;</span>,<span class="st">&#39;Embarked&#39;</span>,
+                 <span class="st">&#39;Title&#39;</span>,<span class="st">&#39;Surname&#39;</span>,<span class="st">&#39;Family&#39;</span>,<span class="st">&#39;FsizeD&#39;</span>)
+
+full[factor_vars] &lt;-<span class="st"> </span><span class="kw">lapply</span>(full[factor_vars], <span class="cf">function</span>(x) <span class="kw">as.factor</span>(x))
+
+<span class="co"># Set a random seed</span>
+<span class="kw">set.seed</span>(<span class="dv">129</span>)
+
+<span class="co"># Perform mice imputation, excluding certain less-than-useful variables:</span>
+mice_mod &lt;-<span class="st"> </span><span class="kw">mice</span>(full[, <span class="op">!</span><span class="kw">names</span>(full) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;PassengerId&#39;</span>,<span class="st">&#39;Name&#39;</span>,<span class="st">&#39;Ticket&#39;</span>,<span class="st">&#39;Cabin&#39;</span>,<span class="st">&#39;Family&#39;</span>,<span class="st">&#39;Surname&#39;</span>,<span class="st">&#39;Survived&#39;</span>)], <span class="dt">method=</span><span class="st">&#39;rf&#39;</span>) </code></pre></div>
+<pre><code>## 
+##  iter imp variable
+##   1   1  Age  Deck
+##   1   2  Age  Deck
+##   1   3  Age  Deck
+##   1   4  Age  Deck
+##   1   5  Age  Deck
+##   2   1  Age  Deck
+##   2   2  Age  Deck
+##   2   3  Age  Deck
+##   2   4  Age  Deck
+##   2   5  Age  Deck
+##   3   1  Age  Deck
+##   3   2  Age  Deck
+##   3   3  Age  Deck
+##   3   4  Age  Deck
+##   3   5  Age  Deck
+##   4   1  Age  Deck
+##   4   2  Age  Deck
+##   4   3  Age  Deck
+##   4   4  Age  Deck
+##   4   5  Age  Deck
+##   5   1  Age  Deck
+##   5   2  Age  Deck
+##   5   3  Age  Deck
+##   5   4  Age  Deck
+##   5   5  Age  Deck</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Save the complete output </span>
+mice_output &lt;-<span class="st"> </span><span class="kw">complete</span>(mice_mod)</code></pre></div>
+<p>Let’s compare the results we get with the original distribution of passenger ages to ensure that nothing has gone completely awry.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Plot age distributions</span>
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(full<span class="op">$</span>Age, <span class="dt">freq=</span>F, <span class="dt">main=</span><span class="st">&#39;Age: Original Data&#39;</span>, 
+  <span class="dt">col=</span><span class="st">&#39;darkgreen&#39;</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="fl">0.04</span>))
+<span class="kw">hist</span>(mice_output<span class="op">$</span>Age, <span class="dt">freq=</span>F, <span class="dt">main=</span><span class="st">&#39;Age: MICE Output&#39;</span>, 
+  <span class="dt">col=</span><span class="st">&#39;lightgreen&#39;</span>, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="fl">0.04</span>))</code></pre></div>
+<p><img src="__results___files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>Things look good, so let’s replace our age vector in the original data with the output from the <code>mice</code> model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Replace Age variable from the mice model.</span>
+full<span class="op">$</span>Age &lt;-<span class="st"> </span>mice_output<span class="op">$</span>Age
+
+<span class="co"># Show new number of missing Age values</span>
+<span class="kw">sum</span>(<span class="kw">is.na</span>(full<span class="op">$</span>Age))</code></pre></div>
+<pre><code>## [1] 0</code></pre>
+<p>We’ve finished imputing values for all variables that we care about for now! Now that we have a complete Age variable, there are just a few finishing touches I’d like to make. We can use Age to do just a bit more feature engineering …</p>
+</div>
+<div id="feature-engineering-round-2" class="section level2">
+<h2><span class="header-section-number">3.3</span> Feature Engineering: Round 2</h2>
+<p>Now that we know everyone’s age, we can create a couple of new age-dependent variables: <strong>Child</strong> and <strong>Mother</strong>. A child will simply be someone under 18 years of age and a mother is a passenger who is 1) female, 2) is over 18, 3) has more than 0 children (no kidding!), and 4) does not have the title ‘Miss’.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># First we&#39;ll look at the relationship between age &amp; survival</span>
+<span class="kw">ggplot</span>(full[<span class="dv">1</span><span class="op">:</span><span class="dv">891</span>,], <span class="kw">aes</span>(Age, <span class="dt">fill =</span> <span class="kw">factor</span>(Survived))) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_histogram</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="co"># I include Sex since we know (a priori) it&#39;s a significant predictor</span>
+<span class="st">  </span><span class="kw">facet_grid</span>(.<span class="op">~</span>Sex) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">theme_few</span>()</code></pre></div>
+<p><img src="__results___files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create the column child, and indicate whether child or adult</span>
+full<span class="op">$</span>Child[full<span class="op">$</span>Age <span class="op">&lt;</span><span class="st"> </span><span class="dv">18</span>] &lt;-<span class="st"> &#39;Child&#39;</span>
+full<span class="op">$</span>Child[full<span class="op">$</span>Age <span class="op">&gt;=</span><span class="st"> </span><span class="dv">18</span>] &lt;-<span class="st"> &#39;Adult&#39;</span>
+
+<span class="co"># Show counts</span>
+<span class="kw">table</span>(full<span class="op">$</span>Child, full<span class="op">$</span>Survived)</code></pre></div>
+<pre><code>##        
+##           0   1
+##   Adult 484 274
+##   Child  65  68</code></pre>
+<p>Looks like being a child doesn’t hurt, but it’s not going to necessarily save you either! We will finish off our feature engineering by creating the <strong>Mother</strong> variable. Maybe we can hope that mothers are more likely to have survived on the Titanic.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Adding Mother variable</span>
+full<span class="op">$</span>Mother &lt;-<span class="st"> &#39;Not Mother&#39;</span>
+full<span class="op">$</span>Mother[full<span class="op">$</span>Sex <span class="op">==</span><span class="st"> &#39;female&#39;</span> <span class="op">&amp;</span><span class="st"> </span>full<span class="op">$</span>Parch <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>full<span class="op">$</span>Age <span class="op">&gt;</span><span class="st"> </span><span class="dv">18</span> <span class="op">&amp;</span><span class="st"> </span>full<span class="op">$</span>Title <span class="op">!=</span><span class="st"> &#39;Miss&#39;</span>] &lt;-<span class="st"> &#39;Mother&#39;</span>
+
+<span class="co"># Show counts</span>
+<span class="kw">table</span>(full<span class="op">$</span>Mother, full<span class="op">$</span>Survived)</code></pre></div>
+<pre><code>##             
+##                0   1
+##   Mother      16  39
+##   Not Mother 533 303</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Finish by factorizing our two new factor variables</span>
+full<span class="op">$</span>Child  &lt;-<span class="st"> </span><span class="kw">factor</span>(full<span class="op">$</span>Child)
+full<span class="op">$</span>Mother &lt;-<span class="st"> </span><span class="kw">factor</span>(full<span class="op">$</span>Mother)</code></pre></div>
+<p>All of the variables we care about should be taken care of and there should be no missing data. I’m going to double check just to be sure:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">md.pattern</span>(full)</code></pre></div>
+<pre><code>## Warning in data.matrix(x): NAs introduced by coercion
+
+## Warning in data.matrix(x): NAs introduced by coercion
+
+## Warning in data.matrix(x): NAs introduced by coercion</code></pre>
+<pre><code>##     PassengerId Pclass Sex Age SibSp Parch Fare Embarked Title Surname
+## 150           1      1   1   1     1     1    1        1     1       1
+##  61           1      1   1   1     1     1    1        1     1       1
+##  54           1      1   1   1     1     1    1        1     1       1
+## 511           1      1   1   1     1     1    1        1     1       1
+##  30           1      1   1   1     1     1    1        1     1       1
+## 235           1      1   1   1     1     1    1        1     1       1
+## 176           1      1   1   1     1     1    1        1     1       1
+##  92           1      1   1   1     1     1    1        1     1       1
+##               0      0   0   0     0     0    0        0     0       0
+##     Fsize Family FsizeD Child Mother Ticket Survived Deck Name Cabin     
+## 150     1      1      1     1      1      1        1    1    0     0    2
+##  61     1      1      1     1      1      1        0    1    0     0    3
+##  54     1      1      1     1      1      0        1    1    0     0    3
+## 511     1      1      1     1      1      1        1    0    0     0    3
+##  30     1      1      1     1      1      0        0    1    0     0    4
+## 235     1      1      1     1      1      1        0    0    0     0    4
+## 176     1      1      1     1      1      0        1    0    0     0    4
+##  92     1      1      1     1      1      0        0    0    0     0    5
+##         0      0      0     0      0    352      418 1014 1309  1309 4402</code></pre>
+<p>Wow! We have finally finished treating all of the relevant missing values in the Titanic dataset which has included some fancy imputation with <code>mice</code>. We have also successfully created several new variables which we hope will help us build a model which reliably predicts survival.</p>
+</div>
+</div>
+<div id="prediction" class="section level1">
+<h1><span class="header-section-number">4</span> Prediction</h1>
+<p>At last we’re ready to predict who survives among passengers of the Titanic based on variables that we carefully curated and treated for missing values. For this, we will rely on the <code>randomForest</code> classification algorithm; we spent all that time on imputation, after all.</p>
+<div id="split-into-training-test-sets" class="section level2">
+<h2><span class="header-section-number">4.1</span> Split into training &amp; test sets</h2>
+<p>Our first step is to split the data back into the original test and training sets.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Split the data back into a train set and a test set</span>
+train &lt;-<span class="st"> </span>full[<span class="dv">1</span><span class="op">:</span><span class="dv">891</span>,]
+test &lt;-<span class="st"> </span>full[<span class="dv">892</span><span class="op">:</span><span class="dv">1309</span>,]</code></pre></div>
+</div>
+<div id="building-the-model" class="section level2">
+<h2><span class="header-section-number">4.2</span> Building the model</h2>
+<p>We then build our model using <code>randomForest</code> on the training set.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Set a random seed</span>
+<span class="kw">set.seed</span>(<span class="dv">754</span>)
+
+<span class="co"># Build the model (note: not all possible variables are used)</span>
+rf_model &lt;-<span class="st"> </span><span class="kw">randomForest</span>(<span class="kw">factor</span>(Survived) <span class="op">~</span><span class="st"> </span>Pclass <span class="op">+</span><span class="st"> </span>Sex <span class="op">+</span><span class="st"> </span>Age <span class="op">+</span><span class="st"> </span>SibSp <span class="op">+</span><span class="st"> </span>Parch <span class="op">+</span><span class="st"> </span>
+<span class="st">                                            </span>Fare <span class="op">+</span><span class="st"> </span>Embarked <span class="op">+</span><span class="st"> </span>Title <span class="op">+</span><span class="st"> </span>
+<span class="st">                                            </span>FsizeD <span class="op">+</span><span class="st"> </span>Child <span class="op">+</span><span class="st"> </span>Mother,
+                                            <span class="dt">data =</span> train)
+
+<span class="co"># Show model error</span>
+<span class="kw">plot</span>(rf_model, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="fl">0.36</span>))
+<span class="kw">legend</span>(<span class="st">&#39;topright&#39;</span>, <span class="kw">colnames</span>(rf_model<span class="op">$</span>err.rate), <span class="dt">col=</span><span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dt">fill=</span><span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)</code></pre></div>
+<p><img src="__results___files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p>The black line shows the overall error rate which falls below 20%. The red and green lines show the error rate for ‘died’ and ‘survived’ respectively. We can see that right now we’re much more successful predicting death than we are survival. What does that say about me, I wonder?</p>
+</div>
+<div id="variable-importance" class="section level2">
+<h2><span class="header-section-number">4.3</span> Variable importance</h2>
+<p>Let’s look at relative variable importance by plotting the mean decrease in Gini calculated across all trees.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Get importance</span>
+importance    &lt;-<span class="st"> </span><span class="kw">importance</span>(rf_model)
+varImportance &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Variables =</span> <span class="kw">row.names</span>(importance), 
+                            <span class="dt">Importance =</span> <span class="kw">round</span>(importance[ ,<span class="st">&#39;MeanDecreaseGini&#39;</span>],<span class="dv">2</span>))
+
+<span class="co"># Create a rank variable based on importance</span>
+rankImportance &lt;-<span class="st"> </span>varImportance <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Rank =</span> <span class="kw">paste0</span>(<span class="st">&#39;#&#39;</span>,<span class="kw">dense_rank</span>(<span class="kw">desc</span>(Importance))))
+
+<span class="co"># Use ggplot2 to visualize the relative importance of variables</span>
+<span class="kw">ggplot</span>(rankImportance, <span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw">reorder</span>(Variables, Importance), 
+    <span class="dt">y =</span> Importance, <span class="dt">fill =</span> Importance)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&#39;identity&#39;</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_text</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Variables, <span class="dt">y =</span> <span class="fl">0.5</span>, <span class="dt">label =</span> Rank),
+    <span class="dt">hjust=</span><span class="dv">0</span>, <span class="dt">vjust=</span><span class="fl">0.55</span>, <span class="dt">size =</span> <span class="dv">4</span>, <span class="dt">colour =</span> <span class="st">&#39;red&#39;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&#39;Variables&#39;</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">coord_flip</span>() <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">theme_few</span>()</code></pre></div>
+<p><img src="__results___files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<p>Whoa, glad we made our title variable! It has the highest relative importance out of all of our predictor variables. I think I’m most surprised to see that passenger class fell to #5, but maybe that’s just bias coming from watching the movie Titanic too many times as a kid.</p>
+</div>
+<div id="prediction-1" class="section level2">
+<h2><span class="header-section-number">4.4</span> Prediction!</h2>
+<p>We’re ready for the final step — making our prediction! When we finish here, we could iterate through the preceding steps making tweaks as we go or fit the data using different models or use different combinations of variables to achieve better predictions. But this is a good starting (and stopping) point for me now.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Predict using the test set</span>
+prediction &lt;-<span class="st"> </span><span class="kw">predict</span>(rf_model, test)
+
+<span class="co"># Save the solution to a dataframe with two columns: PassengerId and Survived (prediction)</span>
+solution &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">PassengerID =</span> test<span class="op">$</span>PassengerId, <span class="dt">Survived =</span> prediction)
+
+<span class="co"># Write the solution to file</span>
+<span class="kw">write.csv</span>(solution, <span class="dt">file =</span> <span class="st">&#39;rf_mod_Solution.csv&#39;</span>, <span class="dt">row.names =</span> F)</code></pre></div>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1><span class="header-section-number">5</span> Conclusion</h1>
+<p>Thank you for taking the time to read through my first exploration of a Kaggle dataset. I look forward to doing more. Again, this newbie welcomes comments and suggestions!</p>
+<hr />
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
